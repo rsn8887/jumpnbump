@@ -22,17 +22,24 @@ Switch:
 Vita:
 - install the .vpk file using Vitashell
 
-Switch-exclusive features
+Switch/Vita-exclusive features
 =====
-- Split Joycon support: To toggle between split and combined Joycons, press R or L on joycon 1.
+- Split Joycon support (Switch only): To toggle between split and combined Joycons, press L on joycon 1.
+- Physical keyboard support via Bluetooth (Vita) and USB (Switch)
 
-Controls (controls updated with version 1.08)
+Controls
 =====
-Left analog stick / Dpad = Move the character  
-B/Y/A/X = Jump
-Plus/Minus/Select/Start = ESC (restart game/advance through statistic screens)
-R (on controller 1) = toggle aspect ratio between original (default), 4:3, and 16:9
-L (on controller 1) = toggle split Joycon mode on/off (Switch only)
+Left analog stick / Dpad = move the character, up to four controllers are supported  
+B / Y / A / X = Jump  
+Plus/Minus/Select/Start = ESC (restart game/advance through statistic screens)  
+R (on controller 1) = toggle aspect ratio between original (default), 4:3, and 16:9  
+L (on controller 1) = toggle split Joycon mode on/off (Switch only)  
+
+Physical keyboard controls via Bluetooth (Vita) and USB (Switch):
+Cursor keys = white rabbit move and jump  
+a d w = yellow rabbit move and jump  
+i j l = gray rabbit move and jump  
+Keypad 4 / 8 / 6 = brown rabbit move and jump  
 
 Build Instructions
 =====
