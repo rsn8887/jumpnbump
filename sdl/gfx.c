@@ -35,19 +35,42 @@
 #else
     #include "jumpnbump64.xpm"
 #endif
+
+#ifdef __SWITCH__
+#include <switch.h>
+void update_joycon_mode(); // call this once per frame to update split/dual joycon mode
+static int single_joycons = 0; // are single Joycons being used right now?
+int single_joycon_mode = 0; // is the user requesting singleJoyconMode?
+#endif
+
+#if defined(__SWITCH__) || defined(__PSP2__)
+int keep_aspect = 1;
+#endif
+
 SDL_Surface *icon;
 
+#if defined(__SWITCH__) || defined(__PSP2__)
+int screen_width=400;
+int screen_height=256;
+int screen_pitch=400;
+int scale_up=0;
+#else
 int screen_width=800;
 int screen_height=512;
 int screen_pitch=800;
 int scale_up=1;
+#endif
 
 static SDL_Window *jnb_window = NULL;
 static SDL_Renderer *jnb_renderer = NULL;
 static SDL_PixelFormat *jnb_pixelformat = NULL;
 static SDL_Texture *jnb_texture = NULL;
 static SDL_PixelFormat* jnb_texture_pixel_format = NULL;
+#if defined(__SWITCH__) || defined(__PSP2__)
 static int fullscreen = 1;
+#else
+static int fullscreen = 1;
+#endif
 static int vinited = 0;
 static void *screen_buffer[2];
 static int drawing_enable = 0;
@@ -413,6 +436,11 @@ void set_pixel(int page, int x, int y, int color)
 
 void flippage(int page)
 {
+#ifdef __SWITCH__
+    // split/combine joycons depending on user setting and handheld mode
+    update_joycon_mode();
+#endif
+
 	int x,y,pitch;
 	unsigned char *src;
 	unsigned char *dest;
@@ -484,7 +512,28 @@ void flippage(int page)
 			}
 		}
 	}
-
+#if defined(__SWITCH__) || defined(__PSP2__)
+	int window_height = 0;
+	int window_width = 0;
+	SDL_GetWindowSize(jnb_window, &window_width, &window_height);
+	if (keep_aspect == 1) {
+		current_render_size.h = window_height;
+		current_render_size.w = (window_height * JNB_WIDTH) / ((float) JNB_HEIGHT);
+		current_render_size.x = (window_width - current_render_size.w) / 2;
+		current_render_size.y = 0;
+	} else if (keep_aspect == 2) {
+		current_render_size.h = window_height;
+		current_render_size.w = (window_height * 4) / ((float) 3);
+		current_render_size.x = (window_width - current_render_size.w) / 2;
+		current_render_size.y = 0;
+	} else {
+		current_render_size.w = window_width;
+		current_render_size.h = window_height;
+		current_render_size.x = 0;
+		current_render_size.y = 0;
+	}
+#endif
+	SDL_RenderClear(jnb_renderer);
 	SDL_RenderCopy(jnb_renderer, jnb_texture, NULL, &current_render_size);
 	SDL_RenderPresent(jnb_renderer);
 }
@@ -1032,3 +1081,56 @@ void on_resized(int width, int height)
 	SDL_RenderPresent(jnb_renderer);
 }
 
+#ifdef __SWITCH__
+void update_joycon_mode() {
+	int handheld = hidGetHandheldMode();
+	int coalesce_controllers = 0;
+	int split_controllers = 0;
+	if (!handheld) {
+		if (single_joycon_mode) {
+			if (!single_joycons) {
+				split_controllers = 1;
+				single_joycons = 1;
+			}
+		} else if (single_joycons) {
+			coalesce_controllers = 1;
+			single_joycons = 0;
+		}
+	} else {
+		if (single_joycons) {
+			coalesce_controllers = 1;
+			single_joycons = 0;
+		}
+	}
+	if (coalesce_controllers) {
+		// find all left/right single JoyCon pairs and join them together
+		for (int id = 0; id < 8; id++) {
+			hidSetNpadJoyAssignmentModeDual((HidControllerID) id);
+		}
+		int last_right_id = 8;
+		for (int id0 = 0; id0 < 8; id0++) {
+			if (hidGetControllerType((HidControllerID) id0) & TYPE_JOYCON_LEFT) {
+				for (int id1 = last_right_id - 1; id1 >= 0; id1--) {
+					if (hidGetControllerType((HidControllerID) id1) & TYPE_JOYCON_RIGHT) {
+						last_right_id = id1;
+						// prevent missing player numbers
+						if (id0 < id1) {
+							hidMergeSingleJoyAsDualJoy((HidControllerID) id0, (HidControllerID) id1);
+						} else if (id0 > id1) {
+							hidMergeSingleJoyAsDualJoy((HidControllerID) id1, (HidControllerID) id0);
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+	if (split_controllers) {
+		for (int id = 0; id < 8; id++) {
+			hidSetNpadJoyAssignmentModeSingleByDefault((HidControllerID) id);
+		}
+		hidSetNpadJoyHoldType(HidJoyHoldType_Horizontal);
+		hidScanInput();
+	}
+}
+#endif

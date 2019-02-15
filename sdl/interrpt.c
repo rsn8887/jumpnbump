@@ -26,6 +26,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#if defined(__SWITCH__) || defined(__PSP2__)
+#include "globals.h"
+#include <SDL_platform.h>
+extern int num_joys;
+extern SDL_Joystick* joys[4];
+#endif
+
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -294,6 +302,18 @@ int hook_keyb_handler(void)
 
 int key_pressed(int key)
 {
+#if defined(__SWITCH__) || defined(__PSP2__)
+	if (key == 1) {
+		for (int i = 0; i < num_joys; i++) {
+			if (i < 4) {
+				// any player plus or minus (start or select) acts as escape key on switch (vita)
+				if (SDL_JoystickGetButton(joys[i], 10) || SDL_JoystickGetButton(joys[i], 11)) {
+					return 1;
+				}
+			}
+		}
+	}
+#endif
 	return keyb[(unsigned char) key];
 }
 

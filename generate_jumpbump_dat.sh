@@ -1,13 +1,16 @@
 #!/bin/bash
 
-CURRENT_SCRIPT="`readlink -f $0`"
-SRC_DIR="`dirname ${CURRENT_SCRIPT}`"
+#CURRENT_SCRIPT="`readlink -f $0`"
+#SRC_DIR="`dirname ${CURRENT_SCRIPT}`"
+SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-tcc -run ${SRC_DIR}/modify/gobpack.c ${SRC_DIR}/data/numbers || exit $?
-tcc -run ${SRC_DIR}/modify/gobpack.c ${SRC_DIR}/data/objects || exit $?
-tcc -run ${SRC_DIR}/modify/gobpack.c ${SRC_DIR}/data/rabbit || exit $?
-tcc -run ${SRC_DIR}/modify/gobpack.c ${SRC_DIR}/data/font || exit $?
-tcc -run ${SRC_DIR}/modify/jnbpack.c \
+gcc ${SRC_DIR}/modify/gobpack.c 
+./a.out ${SRC_DIR}/data/numbers
+./a.out ${SRC_DIR}/data/objects
+./a.out ${SRC_DIR}/data/rabbit
+./a.out ${SRC_DIR}/data/font
+gcc -o b.out ${SRC_DIR}/modify/jnbpack.c
+./b.out \
 	-o jumpbump.dat \
 	${SRC_DIR}/data/bump.mod \
 	${SRC_DIR}/data/calib.dat \
@@ -26,5 +29,5 @@ tcc -run ${SRC_DIR}/modify/jnbpack.c \
 	numbers.gob \
 	objects.gob \
 	rabbit.gob \
-	font.gob || exit $?
+	font.gob
 

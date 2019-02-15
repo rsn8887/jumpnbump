@@ -38,6 +38,11 @@
 static Mix_Music *current_music = (Mix_Music *) NULL;
 #endif
 
+#ifdef __SWITCH__
+extern int single_joycon_mode;
+extern void update_joycon_mode();
+#endif
+
 sfx_data sounds[NUM_SFX];
 
 static int SAMPLECOUNT = 512;
@@ -304,6 +309,12 @@ void dj_deinit(void)
 	current_music = NULL;
 
 	Mix_CloseAudio();
+#endif
+
+#ifdef __SWITCH__
+	// on quit, recombine any split joycons again
+	single_joycon_mode = 0;
+	update_joycon_mode();
 #endif
 
 	SDL_Quit();

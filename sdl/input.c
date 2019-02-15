@@ -29,8 +29,8 @@
 
 #include <SDL_platform.h>
 
-static int num_joys=0;
-static SDL_Joystick* joys[4];
+int num_joys=0;
+SDL_Joystick* joys[4];
 SDL_Joystick* accelerometer = NULL;
 
 /* assumes joysticks have at least one button, could check numbuttons first? */
@@ -47,11 +47,29 @@ SDL_Joystick* accelerometer = NULL;
 #	define ACCELEROMETER_JOY_RIGHT() (0)
 #endif
 
-#define JOY_LEFT(num) (num_joys>num && SDL_JoystickGetAxis(joys[num], 0)<-3200)
-#define JOY_RIGHT(num) (num_joys>num && SDL_JoystickGetAxis(joys[num], 0)>3200)
-
+#ifdef __SWITCH__
+extern int single_joycon_mode;
+extern int keep_aspect;
+static int can_change_single_joycon_mode = 1;
+static int can_change_keep_aspect = 1;
+#define JOY_CHANGESINGLEJOYCON(num) (num_joys>num && SDL_JoystickGetButton(joys[num], 6))
+#define JOY_CHANGEKEEPASPECT(num) (num_joys>num && SDL_JoystickGetButton(joys[num], 7))
+#define JOY_JUMP(num) (num_joys>num && (SDL_JoystickGetButton(joys[num], 0) || SDL_JoystickGetButton(joys[num], 1) || SDL_JoystickGetButton(joys[num], 2) || SDL_JoystickGetButton(joys[num], 3)))
+#define JOY_LEFT(num) (num_joys>num && (SDL_JoystickGetButton(joys[num], 16) || SDL_JoystickGetButton(joys[num], 12)))
+#define JOY_RIGHT(num) (num_joys>num && (SDL_JoystickGetButton(joys[num], 18) || SDL_JoystickGetButton(joys[num], 14)))
+#elif defined(__PSP2__)
+extern int keep_aspect;
+static int can_change_keep_aspect = 1;
+#define JOY_CHANGEKEEPASPECT(num) (num_joys>num && (SDL_JoystickGetButton(joys[num], 4) || SDL_JoystickGetButton(joys[num], 5)))
+#define JOY_JUMP(num) (num_joys>num && (SDL_JoystickGetButton(joys[num], 0) || SDL_JoystickGetButton(joys[num], 1) || SDL_JoystickGetButton(joys[num], 2) || SDL_JoystickGetButton(joys[num], 3)))
+#define JOY_LEFT(num) (num_joys>num && ((SDL_JoystickGetAxis(joys[num], 0)<-3200) || SDL_JoystickGetButton(joys[num], 7)))
+#define JOY_RIGHT(num) (num_joys>num && ((SDL_JoystickGetAxis(joys[num], 0)>3200) || SDL_JoystickGetButton(joys[num], 9)))
+#else
 /* I find using the vertical axis to be annoying -- dnb */
 #define JOY_JUMP(num) (num_joys>num && (SDL_JoystickGetButton(joys[num], 0) || SDL_JoystickGetButton(joys[num], 20)))
+#define JOY_LEFT(num) (num_joys>num && SDL_JoystickGetAxis(joys[num], 0)<-3200)
+#define JOY_RIGHT(num) (num_joys>num && SDL_JoystickGetAxis(joys[num], 0)>3200)
+#endif
 
 void update_player_actions(void)
 {
@@ -108,6 +126,26 @@ void update_player_actions(void)
 		if (tmp != player[client_player_num].action_up)
 			tellServerPlayerMoved(client_player_num, MOVEMENT_UP, tmp);
 	}
+#if defined(__SWITCH__) || defined(__PSP2__)
+	if (can_change_keep_aspect && JOY_CHANGEKEEPASPECT(0)) {
+		can_change_keep_aspect = 0;
+		keep_aspect++;
+		keep_aspect %= 3;
+	} 
+	if (!can_change_keep_aspect && !JOY_CHANGEKEEPASPECT(0)) {
+		can_change_keep_aspect = 1;
+	}
+#endif
+
+#ifdef __SWITCH__
+	if (can_change_single_joycon_mode && JOY_CHANGESINGLEJOYCON(0)) {
+		can_change_single_joycon_mode = 0;
+		single_joycon_mode = !single_joycon_mode;
+	} 
+	if (!can_change_single_joycon_mode && !JOY_CHANGESINGLEJOYCON(0)) {
+		can_change_single_joycon_mode = 1;
+	}
+#endif
 }
 
 void init_inputs(void)
