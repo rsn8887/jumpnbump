@@ -1,6 +1,6 @@
 Overview
 =====
-This is my Switch and Vita port of the classic DOS game Jump'n'Bump by Brainchild Design, based on the SDL2 port by @felixhaedicke.
+This is my Switch and Vita port of the classic multiplayer-only MS-DOS game Jump'n'Bump by Brainchild Design, based on the SDL2 port by @felixhaedicke.
 
 Jump'n'Bump is a simple but addictive multiplayer game. The goal is to stomp as many other rabbits as possible to win the game.
 
