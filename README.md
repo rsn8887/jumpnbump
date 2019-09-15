@@ -8,7 +8,7 @@ Jump'n'Bump is a simple but addictive multiplayer game. The goal is to stomp as 
 
 Thanks
 ======
-Thanks to my supporters on Patreon: Andyways, CountDuckula, Greg Gibson, Jesse Harlin, Özgür Karter, Matthew Machnee, and RadicalR.
+Thanks to my supporters on Patreon: Andyways, CountDuckula, Greg Gibson, Jesse Harlin, Duncan Harris, Özgür Karter, Matthew Machnee, Mored1984, Ibrahim Fazel Poor, and RadicalR.
 
 Thanks to the many developers of the game, such as Mattias Brynervall, Andreas Brynervall, Anders Nilsson, and many more.
 
@@ -57,6 +57,10 @@ make jumpnbump.vpk -j12
 
 Changelog
 =====
+v1.01 (Switch only)
+
+- Re-compile with 9.0.0 support
+
 v1.00
 
 - First release on Switch and Vita
