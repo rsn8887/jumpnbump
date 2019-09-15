@@ -140,6 +140,8 @@ elseif(BUILD_NX)
     vorbisidec
     ogg
     modplug
+    opusfile
+    opus
     mpg123
     flac
     z
