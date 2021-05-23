@@ -57,6 +57,10 @@ make jumpnbump.vpk -j12
 
 Changelog
 =====
+v1.02 (Switch only)
+
+- Re-compile with 12.0.0 support
+
 v1.01 (Switch only)
 
 - Re-compile with 9.0.0 support
