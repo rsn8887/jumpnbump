@@ -114,7 +114,7 @@ elseif(BUILD_NX)
     -std=gnu++11
     -std=gnu11
     -Wno-write-strings
-    -march=armv8-a
+    -march=armv8-a+crc+crypto
     -mtune=cortex-a57
     -mtp=soft
 #-fPIE is neccessary to prevent crash on startup
@@ -126,6 +126,10 @@ elseif(BUILD_NX)
     -funsafe-math-optimizations
     -mlittle-endian
     -ffunction-sections
+    -fcommon
+    -fno-rtti
+    -fno-exceptions
+    -O2
   )
   set(LIBS
     SDL2_mixer
@@ -146,7 +150,6 @@ elseif(BUILD_NX)
     flac
     z
     m
-    c
     nx
     stdc++
   )

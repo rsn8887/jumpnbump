@@ -1084,53 +1084,50 @@ void on_resized(int width, int height)
 #ifdef __SWITCH__
 void update_joycon_mode() {
 	int handheld = hidGetHandheldMode();
-	int coalesce_controllers = 0;
-	int split_controllers = 0;
 	if (!handheld) {
 		if (single_joycon_mode) {
 			if (!single_joycons) {
-				split_controllers = 1;
 				single_joycons = 1;
+				for (int id=0; id<8; id++) {
+					hidSetNpadJoyHoldType(HidNpadJoyHoldType_Horizontal);
+					hidScanInput();
+					hidSetNpadJoyAssignmentModeSingleByDefault((HidNpadIdType) id);
+				}
 			}
 		} else if (single_joycons) {
-			coalesce_controllers = 1;
 			single_joycons = 0;
-		}
-	} else {
-		if (single_joycons) {
-			coalesce_controllers = 1;
-			single_joycons = 0;
-		}
-	}
-	if (coalesce_controllers) {
-		// find all left/right single JoyCon pairs and join them together
-		for (int id = 0; id < 8; id++) {
-			hidSetNpadJoyAssignmentModeDual((HidControllerID) id);
-		}
-		int last_right_id = 8;
-		for (int id0 = 0; id0 < 8; id0++) {
-			if (hidGetControllerType((HidControllerID) id0) & TYPE_JOYCON_LEFT) {
-				for (int id1 = last_right_id - 1; id1 >= 0; id1--) {
-					if (hidGetControllerType((HidControllerID) id1) & TYPE_JOYCON_RIGHT) {
-						last_right_id = id1;
-						// prevent missing player numbers
-						if (id0 < id1) {
-							hidMergeSingleJoyAsDualJoy((HidControllerID) id0, (HidControllerID) id1);
-						} else if (id0 > id1) {
-							hidMergeSingleJoyAsDualJoy((HidControllerID) id1, (HidControllerID) id0);
+
+			// find all left/right single JoyCon pairs and join them together
+			for (int id = 0; id < 8; id++) {
+				hidSetNpadJoyHoldType(HidNpadJoyHoldType_Vertical);
+			}
+			int lastRightId = 8;		
+			for (int id0 = 0; id0 < 8; id0++) {
+				if (hidGetNpadStyleSet((HidNpadIdType) id0) & HidNpadStyleTag_NpadJoyLeft ) {
+					for (int id1=lastRightId-1; id1>=0; id1--) {
+						if (hidGetNpadStyleSet((HidNpadIdType) id1) & HidNpadStyleTag_NpadJoyRight ) {
+							lastRightId=id1;
+							// prevent missing player numbers
+							if (id0 < id1) {
+								hidMergeSingleJoyAsDualJoy((HidNpadIdType) id0, (HidNpadIdType) id1);
+							} else if (id0 > id1) {
+								hidMergeSingleJoyAsDualJoy((HidNpadIdType) id1, (HidNpadIdType) id0);
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}
 		}
-	}
-	if (split_controllers) {
-		for (int id = 0; id < 8; id++) {
-			hidSetNpadJoyAssignmentModeSingleByDefault((HidControllerID) id);
+	} else {
+		if (single_joycons) {
+			single_joycons = 0;
+			for (int id=0; id<8; id++) {
+				hidSetNpadJoyHoldType(HidNpadJoyHoldType_Vertical);
+				hidScanInput();
+				hidSetNpadJoyAssignmentModeDual((HidNpadIdType) id);
+			}
 		}
-		hidSetNpadJoyHoldType(HidJoyHoldType_Horizontal);
-		hidScanInput();
 	}
 }
 #endif
