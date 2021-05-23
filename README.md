@@ -8,7 +8,7 @@ Jump'n'Bump is a simple but addictive multiplayer game. The goal is to stomp as 
 
 Thanks
 ======
-Thanks to my supporters on Patreon: Andyways, CountDuckula, Greg Gibson, Jesse Harlin, Duncan Harris, Özgür Karter, Matthew Machnee, Mored1984, Ibrahim Fazel Poor, and RadicalR.
+Thanks to my supporters on Patreon: Andyways, Count Duckula, Jesse Harlin, Thomas Luten, Matthew Machnee, Mored4u, Ibrahim Fazel Poor, RadicalR.
 
 Thanks to the many developers of the game, such as Mattias Brynervall, Andreas Brynervall, Anders Nilsson, and many more.
 
